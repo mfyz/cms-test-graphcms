@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GraphCMS Headless CMS Example</title>
+	<style>
+		body { font: 18px/30px Helvetica,Arial,Sans-Serif; padding: 30px; }
+		.json_preview { margin-bottom: 50px; font: 11px/17px Monaco, Monospace, 'Couirer New'; white-space: pre-wrap; }
+	</style>
+</head>
+<body>
+	<div style="max-width: 600px; margin: 0 auto;">
+		<h1>Articles</h1>
+		<p>A very plain browser/vanilla JS demonstration of GraphCMS headless CMS service.</p>
+		<div id="articles"></div>
+	</div>
+
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script type="text/javascript">
+		var apiUrl = 'https://api-useast.graphcms.com/v1/ck5y7ca01529801fl6dp54d37/master'
+
+		axios.post(apiUrl, {
+			query: `
+			{
+				results: articlesesConnection(where: {}) {
+					edges {
+					node {
+						id
+						title
+						description {
+							html
+						}
+						thumbnail {
+							url
+						}
+					}
+					}
+				}
+			}
+			`
+		})
+			.then((response) => {
+				console.log('articles received from GraphCMS', response)
+				var items = response.data.data.results.edges
+
+				let htmlOutput = '<ul>'
+				for (i in items) {
+					// console.log(items)
+
+					htmlOutput += '<li>'
+						htmlOutput += '<h2>' + items[i].node.title + '</h2>'
+						htmlOutput += '<img src="' + items[i].node.thumbnail.url + '" width="200" />'
+						htmlOutput += '<div>' + items[i].node.description.html + '</div>'
+					htmlOutput += '</li>'
+				}
+				htmlOutput += '</ul>'
+
+				document.querySelector('#articles').innerHTML = htmlOutput
+			})
+			.catch(err => console.log(err));
+	</script>
+</body>
+</html>
